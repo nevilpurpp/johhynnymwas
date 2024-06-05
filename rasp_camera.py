@@ -1,28 +1,37 @@
-import picamera
-import time
+import cv2
 
-# Set video resolution and framerate
-VIDEO_RESOLUTION = (1280, 720)
-VIDEO_FRAMERATE = 30
+# Set video resolution
+VIDEO_WIDTH = 1280
+VIDEO_HEIGHT = 720
 
 # Set video duration (in seconds)
 VIDEO_DURATION = 10
 
-# Function to record video
-def record_video(output_file, duration):
-    with picamera.PiCamera() as camera:
-        camera.resolution = VIDEO_RESOLUTION
-        camera.framerate = VIDEO_FRAMERATE
-        camera.start_recording(output_file)
-        camera.wait_recording(duration)
-        camera.stop_recording()
+# Initialize the camera
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, VIDEO_WIDTH)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT)
 
-# Main function
-def main():
-    output_file = "output_video.h264"  # Set the output file name
-    print(f"Recording video to {output_file} for {VIDEO_DURATION} seconds...")
-    record_video(output_file, VIDEO_DURATION)
-    print("Video recording complete.")
+# Define the codec and create VideoWriter object
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('output_video.avi', fourcc, 20.0, (VIDEO_WIDTH, VIDEO_HEIGHT))
 
-if __name__ == "__main__":
-    main()
+# Record video
+start_time = cv2.getTickCount()
+while(cap.isOpened()):
+    ret, frame = cap.read()
+    if ret:
+        out.write(frame)
+        cv2.imshow('frame', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+        # Check for video duration
+        if (cv2.getTickCount() - start_time) / cv2.getTickFrequency() > VIDEO_DURATION:
+            break
+    else:
+        break
+
+# Release resources
+cap.release()
+out.release()
+cv2.destroyAllWindows()
