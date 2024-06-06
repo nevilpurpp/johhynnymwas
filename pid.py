@@ -55,6 +55,27 @@ def stop():
     GPIO.output(IN2, GPIO.LOW)
     GPIO.output(IN3, GPIO.LOW)
     GPIO.output(IN4, GPIO.LOW)
+def junction_counter(c):
+    cross = 0
+   
+    while cross < c:
+        # Forward movement
+        line_following()
+
+        # Check if all IR sensors detect white line
+        if GPIO.input(SENSOR1) == 1 and GPIO.input(SENSOR2) == 1 and GPIO.input(SENSOR3) == 1 and GPIO.input(SENSOR4) == 1 and GPIO.input(SENSOR5) == 1:
+            # Stop for 100 milliseconds
+            stop(100)
+
+            # Increment cross count
+            cross += 1
+
+            # Move forward until the outer IR sensors detect black
+            while GPIO.input(SENSOR1) == 1 and GPIO.input(SENSOR5) == 1:
+                forward()
+
+            # Print cross count
+            print(cross)
 
 def sensor_readings():
     # Read sensor values (1 means white line detected, 0 means black surface)
@@ -119,6 +140,8 @@ def line_following():
 
 try:
     line_following()
+    junction_counter(2)
+    
 except KeyboardInterrupt:
     pass
 
