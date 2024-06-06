@@ -65,7 +65,7 @@ def junction_counter(c):
         # Check if all IR sensors detect white line
         if GPIO.input(SENSOR1) == 1 and GPIO.input(SENSOR2) == 1 and GPIO.input(SENSOR3) == 1 and GPIO.input(SENSOR4) == 1 and GPIO.input(SENSOR5) == 1:
             # Stop for 100 milliseconds
-            stop(100)
+            stop(1000)
 
             # Increment cross count
             cross += 1
@@ -76,43 +76,6 @@ def junction_counter(c):
 
             # Print cross count
             print(cross)
-def detect_junction(sensor_values):
-    # Define junction patterns
-    T_JUNCTION = [1, 1, 1, 1, 1]
-    CROSSROAD = [1, 1, 1, 1, 1]
-    LEFT_TURN = [1, 1, 1, 0, 0]
-    RIGHT_TURN = [0, 0, 1, 1, 1]
-    NO_LINE = [0, 0, 0, 0, 0]
-
-    if sensor_values == T_JUNCTION:
-        return "T_JUNCTION"
-    elif sensor_values == CROSSROAD:
-        return "CROSSROAD"
-    elif sensor_values == LEFT_TURN:
-        return "LEFT_TURN"
-    elif sensor_values == RIGHT_TURN:
-        return "RIGHT_TURN"
-    elif sensor_values == NO_LINE:
-        return "NO_LINE"
-    else:
-        return "NO_JUNCTION"
-
-def handle_junction(junction_type):
-    if junction_type == "T_JUNCTION":
-        print("T-junction detected, turning right")
-        turn_right()
-    elif junction_type == "CROSSROAD":
-        print("Crossroad detected, moving forward")
-        move_forward()
-    elif junction_type == "LEFT_TURN":
-        print("Left turn detected, turning left")
-        turn_left()
-    elif junction_type == "RIGHT_TURN":
-        print("Right turn detected, turning right")
-        turn_right()
-    elif junction_type == "NO_LINE":
-        print("No line detected, performing about-turn")
-        about_turn()
 def sensor_readings():
     # Read sensor values (1 means white line detected, 0 means black surface)
     s1 = GPIO.input(SENSOR1)
@@ -123,6 +86,7 @@ def sensor_readings():
     return [s1, s2, s3, s4, s5]
 ###################### robotic turns using python script ###############################
 def turn_left():
+   if sensor_value[s1] == 1 and sensor_value[s2] == 1 and sensor_value[s3] == 1
     print("Turning left")
     GPIO.output(IN1, GPIO.LOW)
     GPIO.output(IN2, GPIO.HIGH)
@@ -134,6 +98,7 @@ def turn_left():
     print("Left turn completed")
 
 def turn_right():
+    if sensor_value[s3] == 1 and sensor_value[s4] == 1 and sensor_value[s5] == 1
     print("Turning right")
     GPIO.output(IN1, GPIO.HIGH)
     GPIO.output(IN2, GPIO.LOW)
@@ -145,6 +110,7 @@ def turn_right():
     print("Right turn completed")
 
 def about_turn():
+    
     print("Performing about-turn")
     move_backward()
     set_speed(BASE_SPEED, BASE_SPEED)
@@ -177,9 +143,6 @@ def line_following():
     while True:
         sensor_values = sensor_readings()
         error = calculate_error(sensor_values)
-        if junction_type != "NO_JUNCTION":
-           handle_junction(junction_type)
-            continue  # Skip the rest of the loop if a junction is handled
         # Print the error
         print(f"Sensor values: {sensor_values}, Error: {error}")
         
@@ -213,7 +176,9 @@ def line_following():
 try:
     line_following()
     junction_counter(2)
+    turn_right()
     
+
 except KeyboardInterrupt:
     pass
 
