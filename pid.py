@@ -84,8 +84,8 @@ def calculate_error(sensor_values):
     return sum(value * weight for value, weight in zip(sensor_values, WEIGHTS))
 
 # PD Controller parameters
-KP = 40  # Proportional gain
-KD = 20  # Derivative gain
+KP = 10  # Proportional gain
+KD = 9  # Derivative gain
 BASE_SPEED = 30  # Base speed for motors (0 to 100)
 
 previous_error = 0
