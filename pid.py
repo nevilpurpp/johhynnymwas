@@ -65,8 +65,8 @@ def junction_counter(c):
         # Check if all IR sensors detect white line
         if GPIO.input(SENSOR1) == 1 and GPIO.input(SENSOR2) == 1 and GPIO.input(SENSOR3) == 1 and GPIO.input(SENSOR4) == 1 and GPIO.input(SENSOR5) == 1:
             # Stop for 100 milliseconds
-            stop(1000)
-
+            stop()
+             time.sleep(1.5)
             # Increment cross count
             cross += 1
 
@@ -169,14 +169,37 @@ def line_following():
 
         previous_error = error
         previous_time = current_time
+
+        if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1 and sensor_values[3] == 1 and sensor_values[4] == 1:
+            # Stop for a moment
+            stop()
+            time.sleep(1.5)  # Adjust this value as needed
+            
+            # Increment junction count
+            cross += 1
+            
+            # Make a turn
+            if cross % 2 == 0:
+                turn_left()
+            else:
+                turn_right()
+            
+            # Continue forward after the turn
+            move_forward()
+            set_speed(left_speed, right_speed)
+
+            # Print junction count
+            print(f"Junction count: {cross}")
+
+        #time.sleep(0.01)
         
 
         time.sleep(0.01)
 
 try:
     line_following()
-    junction_counter(2)
-    turn_right()
+   # junction_counter(2)
+    #turn_right()
     
 
 except KeyboardInterrupt:
