@@ -177,7 +177,9 @@ def line_following():
     while True:
         sensor_values = sensor_readings()
         error = calculate_error(sensor_values)
-        
+        if junction_type != "NO_JUNCTION":
+           handle_junction(junction_type)
+            continue  # Skip the rest of the loop if a junction is handled
         # Print the error
         print(f"Sensor values: {sensor_values}, Error: {error}")
         
