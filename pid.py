@@ -66,7 +66,7 @@ def sensor_readings():
     return [s1, s2, s3, s4, s5]
 
 # PID Controller parameters
-KP = 30  # Proportional gain
+KP = 12  # Proportional gain
 KI = 0.1  # Integral gain
 KD = 10  # Derivative gain
 BASE_SPEED = 50  # Base speed for motors (0 to 100)
