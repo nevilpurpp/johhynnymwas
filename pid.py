@@ -86,7 +86,7 @@ def sensor_readings():
     return [s1, s2, s3, s4, s5]
 ###################### robotic turns using python script ###############################
 def turn_left():
-   if sensor_value[s1] == 1 and sensor_value[s2] == 1 and sensor_value[s3] == 1:
+   if SENSOR1 == 1 and SENSOR2 == 1 and SENSOR3 == 1:
     print("Turning left")
     GPIO.output(IN1, GPIO.LOW)
     GPIO.output(IN2, GPIO.HIGH)
@@ -98,7 +98,7 @@ def turn_left():
     print("Left turn completed")
 
 def turn_right():
-    if sensor_value[s3] == 1 and sensor_value[s4] == 1 and sensor_value[s5] == 1:
+    if SENSOR3 == 1 and SENSOR4 == 1 and SENSOR5 == 1:
     print("Turning right")
     GPIO.output(IN1, GPIO.HIGH)
     GPIO.output(IN2, GPIO.LOW)
@@ -171,6 +171,7 @@ def line_following():
         previous_time = current_time
 
         if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1 and sensor_values[3] == 1 and sensor_values[4] == 1:
+            cross = 0
             # Stop for a moment
             stop()
             time.sleep(1.5)  # Adjust this value as needed
