@@ -85,7 +85,40 @@ def sensor_readings():
     s4 = GPIO.input(SENSOR4)
     s5 = GPIO.input(SENSOR5)
     return [s1, s2, s3, s4, s5]
+###################### robotic turns using python script ###############################
+def turn_left():
+    print("Turning left")
+    GPIO.output(IN1, GPIO.LOW)
+    GPIO.output(IN2, GPIO.HIGH)
+    GPIO.output(IN3, GPIO.LOW)
+    GPIO.output(IN4, GPIO.HIGH)
+    set_speed(BASE_SPEED, BASE_SPEED)
+    while GPIO.input(SENSOR4) == 1:
+        time.sleep(0.01)
+    print("Left turn completed")
 
+def turn_right():
+    print("Turning right")
+    GPIO.output(IN1, GPIO.HIGH)
+    GPIO.output(IN2, GPIO.LOW)
+    GPIO.output(IN3, GPIO.HIGH)
+    GPIO.output(IN4, GPIO.LOW)
+    set_speed(BASE_SPEED, BASE_SPEED)
+    while GPIO.input(SENSOR2) == 1:
+        time.sleep(0.01)
+    print("Right turn completed")
+
+def about_turn():
+    print("Performing about-turn")
+    move_backward()
+    set_speed(BASE_SPEED, BASE_SPEED)
+    time.sleep(1.0)  # Adjust time to complete the about-turn
+    while GPIO.input(SENSOR3) == 1:
+        time.sleep(0.01)
+    move_forward()
+    set_speed(BASE_SPEED, BASE_SPEED)
+    time.sleep(1.0)  # Adjust time to complete the about-turn
+    
 # PID Controller parameters
 KP = 12  # Proportional gain
 KI = 0.1  # Integral gain
@@ -135,6 +168,7 @@ def line_following():
 
         previous_error = error
         previous_time = current_time
+        
 
         time.sleep(0.01)
 
