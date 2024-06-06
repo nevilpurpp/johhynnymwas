@@ -76,7 +76,43 @@ def junction_counter(c):
 
             # Print cross count
             print(cross)
+def detect_junction(sensor_values):
+    # Define junction patterns
+    T_JUNCTION = [1, 1, 1, 1, 1]
+    CROSSROAD = [1, 1, 1, 1, 1]
+    LEFT_TURN = [1, 1, 1, 0, 0]
+    RIGHT_TURN = [0, 0, 1, 1, 1]
+    NO_LINE = [0, 0, 0, 0, 0]
 
+    if sensor_values == T_JUNCTION:
+        return "T_JUNCTION"
+    elif sensor_values == CROSSROAD:
+        return "CROSSROAD"
+    elif sensor_values == LEFT_TURN:
+        return "LEFT_TURN"
+    elif sensor_values == RIGHT_TURN:
+        return "RIGHT_TURN"
+    elif sensor_values == NO_LINE:
+        return "NO_LINE"
+    else:
+        return "NO_JUNCTION"
+
+def handle_junction(junction_type):
+    if junction_type == "T_JUNCTION":
+        print("T-junction detected, turning right")
+        turn_right()
+    elif junction_type == "CROSSROAD":
+        print("Crossroad detected, moving forward")
+        move_forward()
+    elif junction_type == "LEFT_TURN":
+        print("Left turn detected, turning left")
+        turn_left()
+    elif junction_type == "RIGHT_TURN":
+        print("Right turn detected, turning right")
+        turn_right()
+    elif junction_type == "NO_LINE":
+        print("No line detected, performing about-turn")
+        about_turn()
 def sensor_readings():
     # Read sensor values (1 means white line detected, 0 means black surface)
     s1 = GPIO.input(SENSOR1)
