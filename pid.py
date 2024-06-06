@@ -35,8 +35,8 @@ GPIO.setup(SENSOR4, GPIO.IN)
 GPIO.setup(SENSOR5, GPIO.IN)
 
 # Initialize PWM on ENA and ENB pins
-pwmA = GPIO.PWM(ENA, 100)  # 100 Hz frequency
-pwmB = GPIO.PWM(ENB, 100)  # 100 Hz frequency
+pwmA = GPIO.PWM(ENA, 1000)  # 100 Hz frequency
+pwmB = GPIO.PWM(ENB, 1000)  # 100 Hz frequency
 pwmA.start(0)  # Start PWM with 0% duty cycle
 pwmB.start(0)  # Start PWM with 0% duty cycle
 
