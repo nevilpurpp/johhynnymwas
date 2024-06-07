@@ -76,13 +76,32 @@ def turn_left():
 
 def turn_right():
     print("Turning right")
+    # Initial turn
     GPIO.output(IN1, GPIO.HIGH)
     GPIO.output(IN2, GPIO.LOW)
     GPIO.output(IN3, GPIO.HIGH)
     GPIO.output(IN4, GPIO.LOW)
-    set_speed(BASE_SPEED, BASE_SPEED)
-    while GPIO.input(SENSOR2) == 1:
-        time.sleep(0.01)
+    set_speed(50, 50)
+    time.sleep(0.2)  # Initial delay
+    stop()
+    z = 0
+
+    while GPIO.input(SENSOR1) == 1 or GPIO.input(SENSOR3) == 1 or GPIO.input(SENSOR5) == 1:
+        GPIO.output(IN1, GPIO.HIGH)
+        GPIO.output(IN2, GPIO.LOW)
+        GPIO.output(IN3, GPIO.HIGH)
+        GPIO.output(IN4, GPIO.LOW)
+        set_speed(80, 60)
+        
+        if z < 1:
+            time.sleep(0.2)
+        if z >= 100:
+            z = 3
+        z += 1
+
+        if GPIO.input(SENSOR3) == 0 or GPIO.input(SENSOR5) == 0:
+            stop()
+            break
     print("Right turn completed")
 
 def about_turn():
@@ -143,6 +162,11 @@ def line_following():
             time.sleep(1.5)
             t_junction_count += 1
             # Decide what to do at a T junction
+            if t_junction_count == 1:
+                print("First T junction, making a right turn")
+                turn_right()
+
+            
             move_forward()
             set_speed(BASE_SPEED, BASE_SPEED)
             print(f"T junction count: {t_junction_count}")
