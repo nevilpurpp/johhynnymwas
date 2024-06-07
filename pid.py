@@ -1,15 +1,13 @@
 import RPi.GPIO as GPIO
 import time
 
-# GPIO pin assignments for motors
+# GPIO pin assignments for motors and sensors
 IN1 = 17
 IN2 = 18
 ENA = 27
 IN3 = 22
 IN4 = 23
 ENB = 24
-
-# GPIO pin assignments for IR sensors
 SENSOR1 = 5
 SENSOR2 = 6
 SENSOR3 = 13
@@ -35,8 +33,8 @@ GPIO.setup(SENSOR4, GPIO.IN)
 GPIO.setup(SENSOR5, GPIO.IN)
 
 # Initialize PWM on ENA and ENB pins
-pwmA = GPIO.PWM(ENA, 1000)  # 100 Hz frequency
-pwmB = GPIO.PWM(ENB, 1000)  # 100 Hz frequency
+pwmA = GPIO.PWM(ENA, 1000)  # 1000 Hz frequency
+pwmB = GPIO.PWM(ENB, 1000)  # 1000 Hz frequency
 pwmA.start(0)  # Start PWM with 0% duty cycle
 pwmB.start(0)  # Start PWM with 0% duty cycle
 
@@ -55,26 +53,8 @@ def stop():
     GPIO.output(IN2, GPIO.LOW)
     GPIO.output(IN3, GPIO.LOW)
     GPIO.output(IN4, GPIO.LOW)
-def junction_counter(c):
-     sensor_values = sensor_readings()
-    cross = 0
-   
-    while cross < c:
-        # Forward movement
-        line_following()
-
-        # Check if all IR sensors detect white line
-          if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1 and sensor_values[3] == 1 and sensor_values[4] == 1:
-            # Stop for 100 milliseconds
-            stop()
-             time.sleep(1.5)
-            # Increment cross count
-            cross += 1
-            # Print cross count
-            print(cross)
 
 def sensor_readings():
-    
     # Read sensor values (1 means white line detected, 0 means black surface)
     s1 = GPIO.input(SENSOR1)
     s2 = GPIO.input(SENSOR2)
@@ -82,49 +62,30 @@ def sensor_readings():
     s4 = GPIO.input(SENSOR4)
     s5 = GPIO.input(SENSOR5)
     return [s1, s2, s3, s4, s5]
-###################### robotic turns using python script ###############################
+
 def turn_left():
-    sensor_values = sensor_readings()
-   if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1:
     print("Turning left")
     GPIO.output(IN1, GPIO.LOW)
     GPIO.output(IN2, GPIO.HIGH)
     GPIO.output(IN3, GPIO.LOW)
     GPIO.output(IN4, GPIO.HIGH)
     set_speed(BASE_SPEED, BASE_SPEED)
-    while sensor_values[2] == 1:
+    while GPIO.input(SENSOR4) == 1:
         time.sleep(0.01)
     print("Left turn completed")
 
 def turn_right():
-    sensor_values = sensor_readings()
-    if sensor_values[0] == 0 and sensor_values[1] == 0 and sensor_values[2] == 1: and sensor_values[3] == 1 and sensor_values[4]== 1:
     print("Turning right")
     GPIO.output(IN1, GPIO.HIGH)
     GPIO.output(IN2, GPIO.LOW)
     GPIO.output(IN3, GPIO.HIGH)
     GPIO.output(IN4, GPIO.LOW)
     set_speed(BASE_SPEED, BASE_SPEED)
-    while sensor_values[2] == 1:
+    while GPIO.input(SENSOR2) == 1:
         time.sleep(0.01)
     print("Right turn completed")
-def turn_u_right():
-    #turning right at junctions
-    sensor_values = sensor_readings()
-    if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1: and sensor_values[3] == 1 and sensor_values[4]==1:
-        print("at junction")
-    GPIO.output(IN1, GPIO.HIGH)
-    GPIO.output(IN2, GPIO.LOW)
-    GPIO.output(IN3, GPIO.LOW)
-    GPIO.output(IN4, GPIO.HIGH)
-    set_speed(BASE_SPEED, BASE_SPEED)
-    while sensor_values[2] == 1:
-        break
-        time.sleep(0.01)
-    print("Right turn Completed")
-    
+
 def about_turn():
-    sensor_values = sensor_readings()
     print("Performing about-turn")
     move_backward()
     set_speed(BASE_SPEED, BASE_SPEED)
@@ -134,7 +95,7 @@ def about_turn():
     move_forward()
     set_speed(BASE_SPEED, BASE_SPEED)
     time.sleep(1.0)  # Adjust time to complete the about-turn
-    
+
 # PID Controller parameters
 KP = 12  # Proportional gain
 KI = 0.1  # Integral gain
@@ -154,12 +115,59 @@ def calculate_error(sensor_values):
 def line_following():
     global previous_error, integral, previous_time
     
+    cross_count = 0
+    t_junction_count = 0
+    l_junction_left_count = 0
+    l_junction_right_count = 0
+
     while True:
         sensor_values = sensor_readings()
         error = calculate_error(sensor_values)
         # Print the error
         print(f"Sensor values: {sensor_values}, Error: {error}")
-        
+
+        # Detect different types of junctions
+        if sensor_values == [1, 1, 1, 1, 1]:  # Cross junction
+            print("Cross junction detected")
+            stop()
+            time.sleep(1.5)
+            cross_count += 1
+            move_forward()
+            set_speed(BASE_SPEED, BASE_SPEED)
+            print(f"Cross junction count: {cross_count}")
+            time.sleep(1.5)
+
+        elif sensor_values[1] == 1 and sensor_values[2] == 1 and sensor_values[3] == 1:  # T junction
+            print("T junction detected")
+            stop()
+            time.sleep(1.5)
+            t_junction_count += 1
+            # Decide what to do at a T junction
+            move_forward()
+            set_speed(BASE_SPEED, BASE_SPEED)
+            print(f"T junction count: {t_junction_count}")
+            time.sleep(1.5)
+
+        elif sensor_values[0] == 1 and sensor_values[2] == 1:  # Left L junction
+            print("Left L junction detected")
+            stop()
+            time.sleep(1.5)
+            l_junction_left_count += 1
+            move_forward()
+            set_speed(BASE_SPEED, BASE_SPEED)
+            print(f"Left L junction count: {l_junction_left_count}")
+            time.sleep(1.5)
+
+        elif sensor_values[4] == 1 and sensor_values[2] == 1:  # Right L junction
+            print("Right L junction detected")
+            stop()
+            time.sleep(1.5)
+            l_junction_right_count += 1
+            move_forward()
+            set_speed(BASE_SPEED, BASE_SPEED)
+            print(f"Right L junction count: {l_junction_right_count}")
+            time.sleep(1.5)
+
         current_time = time.time()
         dt = current_time - previous_time
 
@@ -183,21 +191,11 @@ def line_following():
 
         previous_error = error
         previous_time = current_time
-        right_turn()
-        junction_counter(2)
-        right_u_turn()
-        move_forward()
-        junction_counter(1)
-        move_forward()
-            
+
         time.sleep(0.01)
 
 try:
     line_following()
-   # junction_counter(2)
-    #turn_right()
-    
-
 except KeyboardInterrupt:
     pass
 
