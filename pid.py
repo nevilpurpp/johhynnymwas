@@ -56,6 +56,7 @@ def stop():
     GPIO.output(IN3, GPIO.LOW)
     GPIO.output(IN4, GPIO.LOW)
 def junction_counter(c):
+     sensor_values = sensor_readings()
     cross = 0
    
     while cross < c:
@@ -63,20 +64,17 @@ def junction_counter(c):
         line_following()
 
         # Check if all IR sensors detect white line
-        if GPIO.input(SENSOR1) == 1 and GPIO.input(SENSOR2) == 1 and GPIO.input(SENSOR3) == 1 and GPIO.input(SENSOR4) == 1 and GPIO.input(SENSOR5) == 1:
+          if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1 and sensor_values[3] == 1 and sensor_values[4] == 1:
             # Stop for 100 milliseconds
             stop()
              time.sleep(1.5)
             # Increment cross count
             cross += 1
-
-            # Move forward until the outer IR sensors detect black
-            while GPIO.input(SENSOR1) == 1 and GPIO.input(SENSOR5) == 1:
-                forward()
-
             # Print cross count
             print(cross)
+
 def sensor_readings():
+    
     # Read sensor values (1 means white line detected, 0 means black surface)
     s1 = GPIO.input(SENSOR1)
     s2 = GPIO.input(SENSOR2)
@@ -86,31 +84,47 @@ def sensor_readings():
     return [s1, s2, s3, s4, s5]
 ###################### robotic turns using python script ###############################
 def turn_left():
-   if SENSOR1 == 1 and SENSOR2 == 1 and SENSOR3 == 1:
+    sensor_values = sensor_readings()
+   if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1:
     print("Turning left")
     GPIO.output(IN1, GPIO.LOW)
     GPIO.output(IN2, GPIO.HIGH)
     GPIO.output(IN3, GPIO.LOW)
     GPIO.output(IN4, GPIO.HIGH)
     set_speed(BASE_SPEED, BASE_SPEED)
-    while GPIO.input(SENSOR4) == 1:
+    while sensor_values[2] == 1:
         time.sleep(0.01)
     print("Left turn completed")
 
 def turn_right():
-    if SENSOR3 == 1 and SENSOR4 == 1 and SENSOR5 == 1:
+    sensor_values = sensor_readings()
+    if sensor_values[0] == 0 and sensor_values[1] == 0 and sensor_values[2] == 1: and sensor_values[3] == 1 and sensor_values[4]== 1:
     print("Turning right")
     GPIO.output(IN1, GPIO.HIGH)
     GPIO.output(IN2, GPIO.LOW)
     GPIO.output(IN3, GPIO.HIGH)
     GPIO.output(IN4, GPIO.LOW)
     set_speed(BASE_SPEED, BASE_SPEED)
-    while GPIO.input(SENSOR2) == 1:
+    while sensor_values[2] == 1:
         time.sleep(0.01)
     print("Right turn completed")
-
-def about_turn():
+def turn_u_right():
+    #turning right at junctions
+    sensor_values = sensor_readings()
+    if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1: and sensor_values[3] == 1 and sensor_values[4]==1:
+        print("at junction")
+    GPIO.output(IN1, GPIO.HIGH)
+    GPIO.output(IN2, GPIO.LOW)
+    GPIO.output(IN3, GPIO.LOW)
+    GPIO.output(IN4, GPIO.HIGH)
+    set_speed(BASE_SPEED, BASE_SPEED)
+    while sensor_values[2] == 1:
+        break
+        time.sleep(0.01)
+    print("Right turn Completed")
     
+def about_turn():
+    sensor_values = sensor_readings()
     print("Performing about-turn")
     move_backward()
     set_speed(BASE_SPEED, BASE_SPEED)
@@ -169,32 +183,11 @@ def line_following():
 
         previous_error = error
         previous_time = current_time
-
-        if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1 and sensor_values[3] == 1 and sensor_values[4] == 1:
-            cross = 0
-            # Stop for a moment
-            stop()
-            time.sleep(1.5)  # Adjust this value as needed
+        right_turn()
+        junction_counter(2)
+        right_u_turn()
+        junction_counter(1)
             
-            # Increment junction count
-            cross += 1
-            
-            # Make a turn
-            if cross % 2 == 0:
-                turn_left()
-            else:
-                turn_right()
-            
-            # Continue forward after the turn
-            move_forward()
-            set_speed(left_speed, right_speed)
-
-            # Print junction count
-            print(f"Junction count: {cross}")
-
-        #time.sleep(0.01)
-        
-
         time.sleep(0.01)
 
 try:
