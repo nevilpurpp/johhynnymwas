@@ -186,7 +186,9 @@ def line_following():
         right_turn()
         junction_counter(2)
         right_u_turn()
+        move_forward()
         junction_counter(1)
+        move_forward()
             
         time.sleep(0.01)
 
