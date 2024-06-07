@@ -99,25 +99,26 @@ def turn_left():
 def turn_right():
     sensor_values = sensor_readings()
     if sensor_values[0] == 0 and sensor_values[1] == 0 and sensor_values[2] == 1: and sensor_values[3] == 1 and sensor_values[4]== 1:
-    print("Turning right")
-    GPIO.output(IN1, GPIO.HIGH)
-    GPIO.output(IN2, GPIO.LOW)
-    GPIO.output(IN3, GPIO.HIGH)
-    GPIO.output(IN4, GPIO.LOW)
-    set_speed(BASE_SPEED, BASE_SPEED)
+        print("Turning right")
+        GPIO.output(IN1, GPIO.HIGH)
+        GPIO.output(IN2, GPIO.LOW)
+        GPIO.output(IN3, GPIO.HIGH)
+        GPIO.output(IN4, GPIO.LOW)
+        set_speed(BASE_SPEED, BASE_SPEED)
     while sensor_values[2] == 1:
-        time.sleep(0.01)
+        break
+        time.sleep(0.020)
     print("Right turn completed")
 def turn_u_right():
     #turning right at junctions
     sensor_values = sensor_readings()
     if sensor_values[0] == 1 and sensor_values[1] == 1 and sensor_values[2] == 1: and sensor_values[3] == 1 and sensor_values[4]==1:
         print("at junction")
-    GPIO.output(IN1, GPIO.HIGH)
-    GPIO.output(IN2, GPIO.LOW)
-    GPIO.output(IN3, GPIO.LOW)
-    GPIO.output(IN4, GPIO.HIGH)
-    set_speed(BASE_SPEED, BASE_SPEED)
+        GPIO.output(IN1, GPIO.HIGH)
+        GPIO.output(IN2, GPIO.LOW)
+        GPIO.output(IN3, GPIO.LOW)
+        GPIO.output(IN4, GPIO.HIGH)
+       set_speed(BASE_SPEED, BASE_SPEED)
     while sensor_values[2] == 1:
         break
         time.sleep(0.01)
@@ -183,7 +184,9 @@ def line_following():
 
         previous_error = error
         previous_time = current_time
-        right_turn()
+        move_forward()
+        turn_right()
+        move_forward()
         junction_counter(2)
         right_u_turn()
         move_forward()
